@@ -1,0 +1,382 @@
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+
+class myProject
+	{
+  
+  public static void main(String[] args) 
+	{
+		//Splash.showSplash(8500);
+		JFrame jf=new myFrame();
+		jf.show();
+		 
+	}
+	}
+
+
+
+
+class myFrame  extends JFrame implements ActionListener 
+	{
+	 
+	 newFTPClient ftpclient;
+	 ConnectionFrame cf;
+			  
+	 public JMenuBar mb;
+	 public JMenu connection,tools,ftp;
+     public JMenuItem connect,exit,mechanism,send,recieve;       
+     Dimension d1;
+	 Toolkit tk;
+	  ImageIcon iicon;
+      Image image;
+	 
+	 public myFrame()
+		{
+		   tk=Toolkit.getDefaultToolkit();
+		  setTitle("FTPClient");
+          setSize(300,300);
+		   d1=tk.getScreenSize();
+           setSize(d1.width,d1.height);
+		   image=tk.getImage("bird1.jpg");
+		  setBackground(new Color(120,150,170));
+		  setIconImage(image);
+		
+		   addWindowListener( new WindowAdapter()
+			                  {
+			                   public void WindowClosing(WindowEvent e)
+				               {System.exit(0);}
+				               }      
+							);
+
+		  
+		   mb=new JMenuBar();
+		  
+		  
+		  
+		   connection = new JMenu("Connection");
+ 		   connect = new JMenuItem("Connect");
+		   exit=new JMenuItem("Exit");
+
+		   connect.addActionListener(this);
+		   connection.add(connect);
+		   exit.addActionListener(this);
+   		   connection.add(exit);
+		
+		 
+		  
+		  tools = new JMenu("Tools");
+		    mechanism = new JMenuItem("Mechanism");
+			mechanism.addActionListener(this);
+                                                tools.add(mechanism);
+		  
+
+		  ftp = new JMenu("FTP");
+		    send=new JMenuItem("Send");
+		    recieve=new JMenuItem("Recieve");
+			send.addActionListener(this);
+			recieve.addActionListener(this);
+		  ftp.add(send);
+		  ftp.add(recieve);
+
+		  mb.add(connection);
+		  mb.add(tools);
+		  mb.add(ftp);
+
+		  add(mb);
+		  setJMenuBar(mb);
+		  //addActionListener();
+		  }
+		  
+	public void actionPerformed(ActionEvent evt)
+		{
+		    
+			Object source = evt.getSource();
+			 if (source == connect)
+			{
+              //JOptionPane.showMessageDialog(null, "Connecting...", "Sampath",JOptionPane.ERROR_MESSAGE); 
+			 cf=new ConnectionFrame("ConnectionFrame");
+				cf.show();
+
+
+			}
+			 if(source == mechanism)
+			{
+				
+				 AlgoFrame ef=new AlgoFrame();
+				 ef.show();
+			 }
+			 
+
+			 if(source==exit)
+			{
+				   // JOptionPane.showMessageDialog(null, "Clossing Connection", "CONFORMATION",JOptionPane.QUESTION_MESSAGE); 
+			        int exit = JOptionPane.showConfirmDialog(this, "Are you sure?");
+                   if (exit == JOptionPane.YES_OPTION) {
+					setVisible(false);
+					System.exit(0);   
+				   }
+			}
+
+			 if(source==send)
+			{
+				 try{
+				ftpclient=(newFTPClient)cf.wantnewFTPClientObject();
+			    }
+				catch(Exception e)
+				{
+					System.out.println("Unable to return the object......"+e);
+				}
+				 transferFrame tf=new transferFrame(ftpclient,"Send");
+				 tf.setVisible(true);  
+			}
+			 if(source==recieve)
+			{
+			  try{
+				ftpclient=(newFTPClient)cf.wantnewFTPClientObject();
+			    }
+				catch(Exception e)
+				{
+					System.out.println("Unable to return the object......"+e);
+				}
+				 transferFrame tf=new transferFrame(ftpclient,"Recieve");
+				 tf.setVisible(true);
+			}
+
+			 
+		}
+
+	}
+
+ class ConnectionFrame extends JFrame implements ActionListener
+  {  
+	    newFTPClient ftpclient;
+
+	     String mode;
+	     JLabel source = new JLabel("IP Address      :");
+	     JLabel dest=new JLabel("Port            :");
+		
+		 JTextField t1=new JTextField(15);
+		 JTextField t2=new JTextField(5);
+	
+		 JButton ok=new JButton("Connect");
+		 JButton cancel=new JButton("Cancel");
+
+   public ConnectionFrame(String m)
+	  {
+	     mode=m;
+	     setTitle(mode);
+	   setSize(400,400);
+	
+   Container cp = getContentPane();
+       cp.setLayout(null);
+	    Font f=new Font("Arial",Font.BOLD,15);
+		
+		source.setFont(f);
+	    dest.setFont(f);
+		
+      source.setBounds(10,50,160,70);
+	  dest.setBounds(10,100,140,70);
+	  
+	  t1.setBounds(140,70,200,30 );
+	  t2.setBounds(140,120,200,30);
+	  
+	  ok.setBounds(100,250,100,30);
+	  cancel.setBounds(250,250,100,30);
+      
+	   cp.add(source);
+	   cp.add(t1);
+	   cp.add(dest);
+	   cp.add(t2);
+
+	   cp.add(ok);
+	   cp.add(cancel);
+       ok.addActionListener(this);
+	   cancel.addActionListener(this);
+
+
+	  }
+	  public newFTPClient wantnewFTPClientObject()
+	  {
+		  //System.out.println("Returning ftpclient object....."+ftpclient); 
+	      return ftpclient;
+	   }
+
+	  public void actionPerformed(ActionEvent ae)
+	  {
+		  String ipaddress;
+		  String portString;
+		  
+		  Object source=ae.getSource();
+		   if(source==ok)
+		  {
+
+			   
+			   ///JOptionPane.showMessageDialog(null, "Ok "+mode+"ing...", "Sampath",JOptionPane.ERROR_MESSAGE);
+		       ipaddress=t1.getText();
+			   portString=t2.getText();
+		
+			   System.out.println("Source file     :"+ipaddress);
+			   System.out.println("Destination file:"+portString);
+                ftpclient=new newFTPClient(ipaddress,portString);
+				// System.out.println("Creating ftpclient object....."+ftpclient); 
+			/*	if(ftpclient!=null)
+			   JOptionPane.showMessageDialog(null,"Connected to Server...", "Message",JOptionPane.INFORMATION_MESSAGE);
+			 	else
+			   JOptionPane.showMessageDialog(null,"Unable to Connect to Server...", "ERROR",JOptionPane.ERROR_MESSAGE);
+             */
+             setVisible(false);
+		}
+		if(source==cancel)
+		  {
+			try
+				{ ftpclient.ClientSoc.close();}
+			catch(Exception e)
+			  {System.out.println("Error Clossing connection:"+e);}
+			setVisible(false);
+		  }
+	  }
+  }
+
+  class transferFrame extends JFrame implements ActionListener
+  {  
+	   newFTPClient ftpclient;
+	     String mode;
+		 JLabel flabel=new JLabel("File Name        :");
+	     JLabel source = new JLabel("Local path      :");
+	     JLabel dest=new JLabel("Remote path        :");
+		
+         JTextField ft=new JTextField(15);
+		 JTextField t1=new JTextField(15);
+		 JTextField t2=new JTextField(5);
+	
+		 JButton send=new JButton("Send");
+		 JButton recieve=new JButton("Recieve");
+		 JButton cancel=new JButton("Cancel");
+   
+   public transferFrame( newFTPClient ftpclient1,String m)
+	  {
+        
+		ftpclient=ftpclient1;
+		if(ftpclient!=null)
+	    System.out.println("Got ftpclient in transferFrame :"+ftpclient);
+		else
+		System.out.println("ftpclient==null");
+		 mode=m;
+	     setTitle(m);
+	   setSize(400,400);
+
+	
+   Container cp = getContentPane();
+       cp.setLayout(null);
+	    Font f=new Font("Arial",Font.BOLD,15);
+		
+		source.setFont(f);
+	    dest.setFont(f);
+		flabel.setFont(f);
+		
+      flabel.setBounds(10,10,160,70);
+	  source.setBounds(10,50,160,70);
+	  dest.setBounds(10,100,140,70);
+	  
+	  ft.setBounds(140,20,200,30);
+	  t1.setBounds(140,70,200,30 );
+	  t2.setBounds(140,120,200,30);
+	  
+	  send.setBounds(100,250,100,30);
+	  recieve.setBounds(100,250,100,30);
+	  cancel.setBounds(250,250,100,30);
+      
+       cp.add(flabel);
+	   cp.add(ft);
+	   cp.add(source);
+	   cp.add(t1);
+	   cp.add(dest);
+	   cp.add(t2);
+       if(mode.equals("Send"))
+		  {
+		   cp.add(send);
+		   send.addActionListener(this);
+		  }
+        if(mode.equals("Recieve"))
+		  {
+		   cp.add(recieve);
+		   recieve.addActionListener(this);
+		  }
+
+	   cp.add(cancel);
+       
+	   cancel.addActionListener(this);
+
+
+	  }
+
+	  public void actionPerformed(ActionEvent ae)
+	  {   
+		  String filename;
+		  String localpath;
+		  String remotepath;
+		  
+		  Object source=ae.getSource();
+		   if(source==send)
+		  {
+
+			   
+			   ///JOptionPane.showMessageDialog(null, "Ok "+mode+"ing...", "Sampath",JOptionPane.ERROR_MESSAGE);
+			   filename=ft.getText();
+		       localpath=t1.getText();
+			   remotepath=t2.getText();
+               String sourcefile=localpath+"\\"+filename;
+			   String dest=remotepath+"\\"+filename; 					
+                
+		       System.out.println("File name :"+filename);
+			   System.out.println("Source file     :"+sourcefile);
+			   System.out.println("Destination file:"+dest);
+              
+              
+			    try
+			  {
+				   ftpclient.SendFile(sourcefile,dest);
+                 
+			  }
+			  catch(Exception e)
+			  {
+				System.out.println("Error Sending file :"+e);
+				JOptionPane.showMessageDialog(null,"Unable to send file...", "Error",JOptionPane.ERROR_MESSAGE);	
+			  }
+             setVisible(false);
+		}
+		  if(source==recieve)
+		  {
+
+			   
+			   ///JOptionPane.showMessageDialog(null, "Ok "+mode+"ing...", "Sampath",JOptionPane.ERROR_MESSAGE);
+			   filename=ft.getText();
+		       localpath=t1.getText();
+			   remotepath=t2.getText();
+			   String sourcefile=remotepath+"\\"+filename; 
+			   String destfile=localpath+"\\"+filename;				
+                
+		       System.out.println("File name :"+filename);
+			   System.out.println("Source file     :"+sourcefile);
+			   System.out.println("Destination file:"+destfile);
+              
+              
+			    try
+			  {
+				   ftpclient.ReceiveFile(sourcefile,destfile);
+			  }
+			  catch(Exception e)
+			  {
+				System.out.println("Error Recieving  file :"+e);
+				JOptionPane.showMessageDialog(null,"Unable to Recieve file...", "Error",JOptionPane.ERROR_MESSAGE);	
+			  }
+             setVisible(false);
+		}
+
+
+
+		if(source==cancel)
+			setVisible(false);
+	  }
+  }
